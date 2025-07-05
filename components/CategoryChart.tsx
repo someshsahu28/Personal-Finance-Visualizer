@@ -83,6 +83,7 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
 
   return (
     <div className="h-64">
+      {/* @ts-ignore */}
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie

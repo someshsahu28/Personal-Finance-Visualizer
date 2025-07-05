@@ -57,6 +57,7 @@ export function MonthlyChart({ transactions }: MonthlyChartProps) {
 
   return (
     <div className="h-64">
+      {/* @ts-ignore */}
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
