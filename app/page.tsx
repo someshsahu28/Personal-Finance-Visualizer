@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
 import { BudgetManager } from '@/components/BudgetManager';
+import BudgetChart from '@/components/BudgetChart';
 
 // Dynamically import chart components to prevent SSR issues
 const MonthlyChart = dynamic(() => import('@/components/MonthlyChart').then(mod => ({ default: mod.MonthlyChart })), {
@@ -17,10 +18,7 @@ const CategoryChart = dynamic(() => import('@/components/CategoryChart').then(mo
   loading: () => <div className="h-64 flex items-center justify-center text-slate-500">Loading chart...</div>
 });
 
-const BudgetChart = dynamic(() => import('@/components/BudgetChart'), {
-  ssr: false,
-  loading: () => <div className="h-64 flex items-center justify-center text-slate-500">Loading chart...</div>
-});
+
 
 const SpendingInsights = dynamic(() => import('@/components/SpendingInsights').then(mod => ({ default: mod.SpendingInsights })), {
   ssr: false,
