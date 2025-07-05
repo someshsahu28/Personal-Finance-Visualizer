@@ -242,7 +242,10 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
                         ${budget.spent.toLocaleString()} / ${budget.budgeted.toLocaleString()}
                       </p>
                       <p className="text-sm text-slate-500">
-                        {budget.remaining > 0 ? `$${budget.remaining.toLocaleString()} left` : `$${Math.abs(budget.remaining).toLocaleString()} over`}
+                        {budget.remaining > 0
+                          ? `$${budget.remaining.toLocaleString()} left`
+                          : `$${Math.abs(budget.remaining).toLocaleString()} over`
+                        }
                       </p>
                     </div>
                   </div>
