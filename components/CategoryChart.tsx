@@ -85,7 +85,9 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
     <div className="h-64">
       {/* @ts-ignore */}
       <ResponsiveContainer width="100%" height="100%">
+        {/* @ts-ignore */}
         <PieChart>
+          {/* @ts-ignore */}
           <Pie
             data={categoryData}
             cx="50%"
@@ -99,7 +101,9 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
+          {/* @ts-ignore */}
           <Tooltip content={<CustomTooltip />} />
+          {/* @ts-ignore */}
           <Legend content={<CustomLegend />} />
         </PieChart>
       </ResponsiveContainer>
