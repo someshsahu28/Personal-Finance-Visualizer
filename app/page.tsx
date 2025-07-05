@@ -17,7 +17,7 @@ const CategoryChart = dynamic(() => import('@/components/CategoryChart').then(mo
   loading: () => <div className="h-64 flex items-center justify-center text-slate-500">Loading chart...</div>
 });
 
-const BudgetChart = dynamic(() => import('@/components/BudgetChart').then(mod => ({ default: mod.BudgetChart })), {
+const BudgetChart = dynamic(() => import('@/components/BudgetChart'), {
   ssr: false,
   loading: () => <div className="h-64 flex items-center justify-center text-slate-500">Loading chart...</div>
 });
