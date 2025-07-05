@@ -96,7 +96,6 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
             outerRadius={80}
             paddingAngle={2}
             dataKey="value"
-            fill="#8884d8"
           />
           {/* @ts-ignore */}
           <Tooltip content={<CustomTooltip />} />
