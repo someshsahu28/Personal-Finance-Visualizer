@@ -97,10 +97,10 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
             paddingAngle={2}
             dataKey="value"
           >
-            {categoryData.map((entry, index) => (
+            {categoryData.map((entry, index) => {
               // @ts-ignore
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
+              return <Cell key={`cell-${index}`} fill={entry.color} />;
+            })}
           </Pie>
           {/* @ts-ignore */}
           <Tooltip content={<CustomTooltip />} />

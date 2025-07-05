@@ -142,13 +142,13 @@ export function BudgetChart({ budgets, expenses, currentMonth }: BudgetChartProp
                 <Bar dataKey="budgeted" fill="#e2e8f0" radius={[4, 4, 0, 0]} name="budgeted" />
                 {/* @ts-ignore */}
                 <Bar dataKey="spent" radius={[4, 4, 0, 0]} name="spent">
-                  {chartData.map((entry, index) => (
+                  {chartData.map((entry, index) => {
                     // @ts-ignore
-                    <Cell
+                    return <Cell
                       key={`cell-${index}`}
                       fill={entry.status === 'over' ? '#ef4444' : entry.status === 'warning' ? '#f59e0b' : '#10b981'}
-                    />
-                  ))}
+                    />;
+                  })}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
