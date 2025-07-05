@@ -143,9 +143,10 @@ export function BudgetChart({ budgets, expenses, currentMonth }: BudgetChartProp
                 {/* @ts-ignore */}
                 <Bar dataKey="spent" radius={[4, 4, 0, 0]} name="spent">
                   {chartData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={entry.status === 'over' ? '#ef4444' : entry.status === 'warning' ? '#f59e0b' : '#10b981'} 
+                    // @ts-ignore
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.status === 'over' ? '#ef4444' : entry.status === 'warning' ? '#f59e0b' : '#10b981'}
                     />
                   ))}
                 </Bar>

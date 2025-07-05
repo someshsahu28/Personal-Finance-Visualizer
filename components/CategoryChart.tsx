@@ -98,6 +98,7 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
             dataKey="value"
           >
             {categoryData.map((entry, index) => (
+              // @ts-ignore
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
