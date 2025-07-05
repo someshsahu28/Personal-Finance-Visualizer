@@ -35,13 +35,13 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
     const currentDate = new Date();
     const currentMonthDate = new Date(currentMonth + '-01');
     const previousMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1);
-    const previousMonthKey = `${previousMonth.getFullYear()}-${String(previousMonth.getMonth() + 1).padStart(2, '0')}`;
+    const previousMonthKey = previousMonth.getFullYear() + '-' + String(previousMonth.getMonth() + 1).padStart(2, '0');
 
     // Current month expenses
     const currentMonthExpenses = transactions
       .filter(t => {
         const transactionDate = new Date(t.date);
-        const transactionMonth = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`;
+        const transactionMonth = transactionDate.getFullYear() + '-' + String(transactionDate.getMonth() + 1).padStart(2, '0');
         return t.type === 'expense' && transactionMonth === currentMonth;
       })
       .reduce((acc, t) => acc + t.amount, 0);
@@ -50,7 +50,7 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
     const previousMonthExpenses = transactions
       .filter(t => {
         const transactionDate = new Date(t.date);
-        const transactionMonth = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`;
+        const transactionMonth = transactionDate.getFullYear() + '-' + String(transactionDate.getMonth() + 1).padStart(2, '0');
         return t.type === 'expense' && transactionMonth === previousMonthKey;
       })
       .reduce((acc, t) => acc + t.amount, 0);
@@ -64,7 +64,7 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
     const categoryExpenses = transactions
       .filter(t => {
         const transactionDate = new Date(t.date);
-        const transactionMonth = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`;
+        const transactionMonth = transactionDate.getFullYear() + '-' + String(transactionDate.getMonth() + 1).padStart(2, '0');
         return t.type === 'expense' && transactionMonth === currentMonth;
       })
       .reduce((acc, t) => {
@@ -108,8 +108,9 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
 
     // Daily average
     const daysInMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 0).getDate();
-    const currentDay = currentMonth === `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}` 
-      ? currentDate.getDate() 
+    const currentDateMonth = currentDate.getFullYear() + '-' + String(currentDate.getMonth() + 1).padStart(2, '0');
+    const currentDay = currentMonth === currentDateMonth
+      ? currentDate.getDate()
       : daysInMonth;
     const dailyAverage = currentDay > 0 ? currentMonthExpenses / currentDay : 0;
     const projectedMonthly = dailyAverage * daysInMonth;
@@ -118,7 +119,7 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
     const currentMonthIncome = transactions
       .filter(t => {
         const transactionDate = new Date(t.date);
-        const transactionMonth = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`;
+        const transactionMonth = transactionDate.getFullYear() + '-' + String(transactionDate.getMonth() + 1).padStart(2, '0');
         return t.type === 'income' && transactionMonth === currentMonth;
       })
       .reduce((acc, t) => acc + t.amount, 0);
@@ -259,8 +260,8 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
                       </p>
                       <p className="text-sm text-slate-500">
                         {budget.remaining > 0
-                          ? `$${budget.remaining.toLocaleString()} left`
-                          : `$${Math.abs(budget.remaining).toLocaleString()} over`
+                          ? '$' + budget.remaining.toLocaleString() + ' left'
+                          : '$' + Math.abs(budget.remaining).toLocaleString() + ' over'
                         }
                       </p>
                     </div>
