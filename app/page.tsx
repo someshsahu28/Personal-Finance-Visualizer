@@ -20,7 +20,7 @@ const CategoryChart = dynamic(() => import('@/components/CategoryChart').then(mo
 
 
 
-const SpendingInsights = dynamic(() => import('@/components/SpendingInsights').then(mod => ({ default: mod.SpendingInsights })), {
+const SpendingInsights = dynamic(() => import('@/components/SpendingInsights'), {
   ssr: false,
   loading: () => <div className="h-64 flex items-center justify-center text-slate-500">Loading insights...</div>
 });

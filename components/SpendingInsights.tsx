@@ -30,7 +30,7 @@ interface SpendingInsightsProps {
   currentMonth: string;
 }
 
-export function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsightsProps) {
+function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsightsProps) {
   const insights = useMemo(() => {
     const currentDate = new Date();
     const currentMonthDate = new Date(currentMonth + '-01');
@@ -419,3 +419,5 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
     </div>
   );
 }
+
+export default SpendingInsights;
