@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { PieChart, Pie, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Transaction } from '@/app/page';
 import { EXPENSE_CATEGORIES } from '@/lib/constants';
 
@@ -96,7 +96,12 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
             outerRadius={80}
             paddingAngle={2}
             dataKey="value"
-          />
+          >
+            {categoryData.map((entry, index) => (
+              // @ts-ignore
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
           {/* @ts-ignore */}
           <Tooltip content={<CustomTooltip />} />
           {/* @ts-ignore */}
