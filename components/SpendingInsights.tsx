@@ -5,8 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { TrendingUp, TrendingDown, AlertTriangle, Target, Calendar, DollarSign } from 'lucide-react';
-import { Transaction, Budget } from '@/app/page';
 import { EXPENSE_CATEGORIES } from '@/lib/constants';
+
+// Define interfaces locally to avoid import issues
+interface Transaction {
+  id: string;
+  date: string;
+  amount: number;
+  description: string;
+  type: 'income' | 'expense';
+  category: string;
+}
+
+interface Budget {
+  id: string;
+  categoryId: string;
+  amount: number;
+  month: string;
+}
 
 interface SpendingInsightsProps {
   transactions: Transaction[];
@@ -352,15 +368,18 @@ export function SpendingInsights({ transactions, budgets, currentMonth }: Spendi
                     Monthly Spending Trend
                   </h4>
                   <p className={`text-sm mt-1 ${
-                    insights.monthlyChange > 10 ? 'text-red-700' : 
+                    insights.monthlyChange > 10 ? 'text-red-700' :
                     insights.monthlyChange > 0 ? 'text-yellow-700' : 'text-green-700'
                   }`}>
-                    {insights.monthlyChange > 10
-                      ? `Your spending increased by ${insights.monthlyChange.toFixed(1)}% this month. Consider reviewing your budget and identifying areas to cut back.`
-                      : insights.monthlyChange > 0
-                      ? `Your spending increased by ${insights.monthlyChange.toFixed(1)}% this month. Monitor this trend to avoid budget overruns.`
-                      : `Great job! Your spending decreased by ${Math.abs(insights.monthlyChange).toFixed(1)}% this month compared to last month.`
-                    }
+                    {insights.monthlyChange > 10 && (
+                      <span>Your spending increased by {insights.monthlyChange.toFixed(1)}% this month. Consider reviewing your budget and identifying areas to cut back.</span>
+                    )}
+                    {insights.monthlyChange > 0 && insights.monthlyChange <= 10 && (
+                      <span>Your spending increased by {insights.monthlyChange.toFixed(1)}% this month. Monitor this trend to avoid budget overruns.</span>
+                    )}
+                    {insights.monthlyChange <= 0 && (
+                      <span>Great job! Your spending decreased by {Math.abs(insights.monthlyChange).toFixed(1)}% this month compared to last month.</span>
+                    )}
                   </p>
                 </div>
               </div>
