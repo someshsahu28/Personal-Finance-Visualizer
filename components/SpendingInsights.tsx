@@ -1,8 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { TrendingUp, Target, Calendar, DollarSign } from 'lucide-react';
 import { EXPENSE_CATEGORIES } from '@/lib/constants';
 
@@ -159,9 +157,9 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
               <p className="text-sm">Set some budgets to see performance insights</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {currentBudgets.map((budget, index) => (
-                <div key={index} className="space-y-2">
+                <div key={index} className="p-3 bg-slate-50 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div
@@ -169,30 +167,19 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
                         style={{ backgroundColor: budget.color }}
                       />
                       <span className="font-medium text-slate-900">{budget.name}</span>
-                      <Badge
-                        variant={budget.isOver ? 'destructive' : budget.isWarning ? 'secondary' : 'default'}
-                        className={budget.isWarning ? 'bg-amber-100 text-amber-800' : ''}
-                      >
-                        {budget.percentage.toFixed(1)}%
-                      </Badge>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-slate-900">
                         ${budget.spent.toFixed(0)} / ${budget.budgeted.toFixed(0)}
                       </p>
-                      <p className="text-sm text-slate-500">
-                        {budget.remaining > 0 ? (
-                          <span>${budget.remaining.toFixed(0)} left</span>
-                        ) : (
-                          <span>${Math.abs(budget.remaining).toFixed(0)} over</span>
-                        )}
+                      <p className={`text-sm ${budget.isOver ? 'text-red-600 font-medium' : budget.isWarning ? 'text-yellow-600' : 'text-green-600'}`}>
+                        {budget.isOver ? 'Over Budget!' : budget.isWarning ? 'Near Limit' : 'On Track'}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {budget.percentage.toFixed(1)}% used
                       </p>
                     </div>
                   </div>
-                  <Progress
-                    value={Math.min(budget.percentage, 100)}
-                    className="h-2"
-                  />
                 </div>
               ))}
             </div>
@@ -215,23 +202,21 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
           ) : (
             <div className="space-y-3">
               {top5Categories.map((category, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center justify-center w-8 h-8 bg-slate-200 rounded-full text-sm font-bold text-slate-600">
-                      {index + 1}
+                <div key={index} className="p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm font-bold text-slate-600">
+                        {index + 1}.
+                      </span>
+                      <div>
+                        <p className="font-medium text-slate-900">{category.name}</p>
+                        <p className="text-sm text-slate-500">{category.percentage.toFixed(1)}% of expenses</p>
+                      </div>
                     </div>
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.color }}
-                    />
-                    <div>
-                      <p className="font-medium text-slate-900">{category.name}</p>
-                      <p className="text-sm text-slate-500">{category.percentage.toFixed(1)}% of total expenses</p>
-                    </div>
+                    <span className="font-semibold text-slate-900">
+                      ${category.amount.toFixed(0)}
+                    </span>
                   </div>
-                  <span className="font-semibold text-slate-900">
-                    ${category.amount.toFixed(0)}
-                  </span>
                 </div>
               ))}
             </div>
