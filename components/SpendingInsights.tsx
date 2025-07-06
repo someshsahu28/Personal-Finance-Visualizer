@@ -32,10 +32,11 @@ interface SpendingInsightsProps {
 
 function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsightsProps) {
   const insights = useMemo(() => {
-    const currentDate = new Date();
-    const currentMonthDate = new Date(currentMonth + '-01');
-    const previousMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1);
-    const previousMonthKey = previousMonth.getFullYear() + '-' + String(previousMonth.getMonth() + 1).padStart(2, '0');
+    try {
+      const currentDate = new Date();
+      const currentMonthDate = new Date(currentMonth + '-01');
+      const previousMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1);
+      const previousMonthKey = previousMonth.getFullYear() + '-' + String(previousMonth.getMonth() + 1).padStart(2, '0');
 
     // Current month expenses
     const currentMonthExpenses = transactions
@@ -56,7 +57,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
       .reduce((acc, t) => acc + t.amount, 0);
 
     // Month-over-month change
-    const monthlyChange = previousMonthExpenses > 0
+    const monthlyChange = (previousMonthExpenses > 0 && !isNaN(previousMonthExpenses) && !isNaN(currentMonthExpenses))
       ? ((currentMonthExpenses - previousMonthExpenses) / previousMonthExpenses) * 100
       : 0;
 
@@ -124,27 +125,47 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
       })
       .reduce((acc, t) => acc + t.amount, 0);
 
-    const savingsRate = currentMonthIncome > 0
+    const savingsRate = (currentMonthIncome > 0 && !isNaN(currentMonthIncome) && !isNaN(currentMonthExpenses))
       ? ((currentMonthIncome - currentMonthExpenses) / currentMonthIncome) * 100
       : 0;
 
-    return {
-      currentMonthExpenses,
-      previousMonthExpenses,
-      monthlyChange,
-      budgetAnalysis,
-      topCategories,
-      dailyAverage,
-      projectedMonthly,
-      savingsRate,
-      currentMonthIncome,
-    };
+      return {
+        currentMonthExpenses,
+        previousMonthExpenses,
+        monthlyChange,
+        budgetAnalysis,
+        topCategories,
+        dailyAverage,
+        projectedMonthly,
+        savingsRate,
+        currentMonthIncome,
+      };
+    } catch (error) {
+      console.error('Error calculating insights:', error);
+      return {
+        currentMonthExpenses: 0,
+        previousMonthExpenses: 0,
+        monthlyChange: 0,
+        budgetAnalysis: [],
+        topCategories: [],
+        dailyAverage: 0,
+        projectedMonthly: 0,
+        savingsRate: 0,
+        currentMonthIncome: 0,
+      };
+    }
   }, [transactions, budgets, currentMonth]);
 
-  const monthName = new Date(currentMonth + '-01').toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric'
-  });
+  const monthName = (() => {
+    try {
+      return new Date(currentMonth + '-01').toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return currentMonth;
+    }
+  })();
 
   return (
     <div className="space-y-6">
