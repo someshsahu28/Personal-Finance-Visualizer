@@ -318,7 +318,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
             <div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border border-indigo-200">
               <div className="flex items-start space-x-3">
                 <div className="flex items-center justify-center w-5 h-5 bg-indigo-600 rounded-full mt-0.5">
-                  <span className="text-white text-xs font-bold">💡</span>
+                  <span className="text-white text-xs font-bold">!</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-indigo-900">Personalized Recommendations</h4>
@@ -327,7 +327,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
                       <p>• Try the 50/30/20 rule: 50% needs, 30% wants, 20% savings</p>
                     )}
                     {dailyAverage > 100 && (
-                      <p>• Consider setting a daily spending limit of ${(dailyAverage * 0.8).toFixed(0)} to reduce monthly expenses</p>
+                      <p>• Consider setting a daily spending limit to reduce monthly expenses</p>
                     )}
                     {currentMonthExpenses > currentMonthIncome && (
                       <p>• Priority: Create an emergency budget to stop overspending immediately</p>
@@ -346,7 +346,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
             <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
               <div className="flex items-start space-x-3">
                 <div className="flex items-center justify-center w-5 h-5 bg-green-600 rounded-full mt-0.5">
-                  <span className="text-white text-xs font-bold">🎯</span>
+                  <span className="text-white text-xs font-bold">G</span>
                 </div>
                 <div>
                   <h4 className="font-medium text-green-900">Next Month Goals</h4>
@@ -354,7 +354,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
                     {savingsRate < 20 && (
                       <p>• Target: Increase savings rate to {Math.min(savingsRate + 5, 20).toFixed(0)}%</p>
                     )}
-                    <p>• Goal: Reduce daily spending to ${Math.max(dailyAverage * 0.9, 50).toFixed(0)} per day</p>
+                    <p>• Goal: Reduce daily spending per day</p>
                     <p>• Challenge: Track every expense for better awareness</p>
                     <p>• Focus: Review and optimize your top 3 spending categories</p>
                   </div>
