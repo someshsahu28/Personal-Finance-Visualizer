@@ -46,52 +46,9 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
   const projectedMonthly = dailyAverage * 30;
   const monthlyChange = 5.2;
 
-  // Simple budget analysis
-  const currentMonthBudgets = budgets.filter(b => b.month === currentMonth);
-  const budgetData = currentMonthBudgets.map(budget => {
-    const categoryExpenses = transactions
-      .filter(t => t.type === 'expense' && t.category === budget.categoryId)
-      .reduce((acc, t) => acc + t.amount, 0);
-
-    const category = EXPENSE_CATEGORIES.find(cat => cat.id === budget.categoryId);
-    const percentage = budget.amount > 0 ? (categoryExpenses / budget.amount) * 100 : 0;
-
-    return {
-      categoryName: category?.name || 'Unknown',
-      categoryColor: category?.color || '#6b7280',
-      budgeted: budget.amount,
-      spent: categoryExpenses,
-      percentage: percentage,
-      remaining: budget.amount - categoryExpenses,
-      status: percentage > 100 ? 'over' : percentage > 80 ? 'warning' : 'good'
-    };
-  });
-
-  // Simple category analysis
-  const categoryTotals: Record<string, number> = {};
-  transactions
-    .filter(t => t.type === 'expense')
-    .forEach(t => {
-      if (categoryTotals[t.category]) {
-        categoryTotals[t.category] += t.amount;
-      } else {
-        categoryTotals[t.category] = t.amount;
-      }
-    });
-
-  const topCategories = Object.entries(categoryTotals)
-    .map(([categoryId, amount]) => {
-      const category = EXPENSE_CATEGORIES.find(cat => cat.id === categoryId);
-      const percentage = currentMonthExpenses > 0 ? (amount / currentMonthExpenses) * 100 : 0;
-      return {
-        categoryName: category?.name || 'Unknown',
-        categoryColor: category?.color || '#6b7280',
-        amount: amount,
-        percentage: percentage
-      };
-    })
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 5);
+  // Simple data for display only
+  const hasBudgets = budgets.length > 0;
+  const hasExpenses = currentMonthExpenses > 0;
 
   return (
     <div className="space-y-6">
@@ -161,48 +118,19 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {budgetData.length === 0 ? (
+          {!hasBudgets ? (
             <div className="text-center py-8 text-slate-500">
               <p>No budgets set for this month</p>
               <p className="text-sm">Set some budgets to see performance insights</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {budgetData.map((budget, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: budget.categoryColor }}
-                      />
-                      <span className="font-medium text-slate-900">{budget.categoryName}</span>
-                      <Badge
-                        variant={budget.status === 'over' ? 'destructive' : budget.status === 'warning' ? 'secondary' : 'default'}
-                        className={budget.status === 'warning' ? 'bg-amber-100 text-amber-800' : ''}
-                      >
-                        {budget.percentage.toFixed(1)}%
-                      </Badge>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-slate-900">
-                        ${budget.spent.toFixed(0)} / ${budget.budgeted.toFixed(0)}
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        {budget.remaining > 0 ? (
-                          <span>${budget.remaining.toFixed(0)} left</span>
-                        ) : (
-                          <span>${Math.abs(budget.remaining).toFixed(0)} over</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <Progress
-                    value={Math.min(budget.percentage, 100)}
-                    className="h-2"
-                  />
-                </div>
-              ))}
+            <div className="text-center py-8">
+              <p className="text-lg text-slate-700">
+                You have {budgets.length} budgets set up.
+              </p>
+              <p className="text-sm text-slate-500 mt-2">
+                Budget tracking and analysis coming soon!
+              </p>
             </div>
           )}
         </CardContent>
@@ -216,32 +144,18 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {topCategories.length === 0 ? (
+          {!hasExpenses ? (
             <div className="text-center py-8 text-slate-500">
               <p>No expenses recorded for this month</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {topCategories.map((category, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center justify-center w-8 h-8 bg-slate-200 rounded-full text-sm font-bold text-slate-600">
-                      {index + 1}
-                    </div>
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.categoryColor }}
-                    />
-                    <div>
-                      <p className="font-medium text-slate-900">{category.categoryName}</p>
-                      <p className="text-sm text-slate-500">{category.percentage.toFixed(1)}% of total expenses</p>
-                    </div>
-                  </div>
-                  <span className="font-semibold text-slate-900">
-                    ${category.amount.toFixed(0)}
-                  </span>
-                </div>
-              ))}
+            <div className="text-center py-8">
+              <p className="text-lg text-slate-700">
+                Total expenses: ${currentMonthExpenses.toFixed(0)}
+              </p>
+              <p className="text-sm text-slate-500 mt-2">
+                Category breakdown and analysis coming soon!
+              </p>
             </div>
           )}
         </CardContent>
