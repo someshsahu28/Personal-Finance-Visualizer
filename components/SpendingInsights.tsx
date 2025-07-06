@@ -173,7 +173,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
                         ${budget.spent.toFixed(0)} / ${budget.budgeted.toFixed(0)}
                       </p>
                       <p className={`text-sm ${budget.isOver ? 'text-red-600 font-medium' : budget.isWarning ? 'text-yellow-600' : 'text-green-600'}`}>
-                        {budget.isOver ? 'Over Budget!' : budget.isWarning ? 'Near Limit' : 'On Track'}
+                        {budget.isOver ? `Over Budget by $${Math.abs(budget.remaining).toFixed(0)}` : budget.isWarning ? 'Near Limit' : 'On Track'}
                       </p>
                       <p className="text-xs text-slate-500">
                         {budget.percentage.toFixed(1)}% used
