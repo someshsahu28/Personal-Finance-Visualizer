@@ -29,104 +29,61 @@ interface SpendingInsightsProps {
 }
 
 function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsightsProps) {
-  // Simple calculations without complex logic
-  const currentMonthExpenses = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((acc, t) => acc + t.amount, 0);
+  const expenses = transactions.filter(t => t.type === 'expense');
+  const income = transactions.filter(t => t.type === 'income');
 
-  const currentMonthIncome = transactions
-    .filter(t => t.type === 'income')
-    .reduce((acc, t) => acc + t.amount, 0);
+  const currentMonthExpenses = expenses.reduce((acc, t) => acc + t.amount, 0);
+  const currentMonthIncome = income.reduce((acc, t) => acc + t.amount, 0);
 
-  const savingsRate = currentMonthIncome > 0
-    ? ((currentMonthIncome - currentMonthExpenses) / currentMonthIncome) * 100
-    : 0;
+  const savingsRate =
+    currentMonthIncome > 0
+      ? ((currentMonthIncome - currentMonthExpenses) / currentMonthIncome) * 100
+      : 0;
 
   const dailyAverage = currentMonthExpenses / 30;
   const projectedMonthly = dailyAverage * 30;
   const monthlyChange = 5.2;
 
-  // Simple budget calculations - no complex operations
-  const currentBudgets = [];
-  for (let i = 0; i < budgets.length; i++) {
-    const budget = budgets[i];
-    if (budget.month === currentMonth) {
-      let spent = 0;
-      for (let j = 0; j < transactions.length; j++) {
-        const transaction = transactions[j];
-        if (transaction.type === 'expense' && transaction.category === budget.categoryId) {
-          spent = spent + transaction.amount;
-        }
-      }
+  const currentBudgets = budgets
+    .filter(b => b.month === currentMonth)
+    .map(budget => {
+      const spent = expenses
+        .filter(t => t.category === budget.categoryId)
+        .reduce((acc, t) => acc + t.amount, 0);
 
       const percentage = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
       const remaining = budget.amount - spent;
 
-      let categoryName = 'Unknown';
-      let categoryColor = '#6b7280';
-      for (let k = 0; k < EXPENSE_CATEGORIES.length; k++) {
-        if (EXPENSE_CATEGORIES[k].id === budget.categoryId) {
-          categoryName = EXPENSE_CATEGORIES[k].name;
-          categoryColor = EXPENSE_CATEGORIES[k].color;
-          break;
-        }
-      }
+      const category = EXPENSE_CATEGORIES.find(c => c.id === budget.categoryId);
 
-      currentBudgets.push({
-        name: categoryName,
-        color: categoryColor,
+      return {
+        name: category?.name || 'Unknown',
+        color: category?.color || '#6b7280',
         budgeted: budget.amount,
         spent: spent,
         percentage: percentage,
         remaining: remaining,
         isOver: percentage > 100,
         isWarning: percentage > 80 && percentage <= 100
-      });
-    }
-  }
-
-  // Simple category totals - no complex operations
-  const categoryTotals: { [key: string]: number } = {};
-  for (let i = 0; i < transactions.length; i++) {
-    const transaction = transactions[i];
-    if (transaction.type === 'expense') {
-      if (categoryTotals[transaction.category]) {
-        categoryTotals[transaction.category] = categoryTotals[transaction.category] + transaction.amount;
-      } else {
-        categoryTotals[transaction.category] = transaction.amount;
-      }
-    }
-  }
-
-  const topCategories = [];
-  for (const categoryId in categoryTotals) {
-    const amount = categoryTotals[categoryId];
-    let categoryName = 'Unknown';
-    let categoryColor = '#6b7280';
-
-    for (let i = 0; i < EXPENSE_CATEGORIES.length; i++) {
-      if (EXPENSE_CATEGORIES[i].id === categoryId) {
-        categoryName = EXPENSE_CATEGORIES[i].name;
-        categoryColor = EXPENSE_CATEGORIES[i].color;
-        break;
-      }
-    }
-
-    const percentage = currentMonthExpenses > 0 ? (amount / currentMonthExpenses) * 100 : 0;
-
-    topCategories.push({
-      name: categoryName,
-      color: categoryColor,
-      amount: amount,
-      percentage: percentage
+      };
     });
+
+  const categoryTotals: Record<string, number> = {};
+  for (const { amount, category } of expenses) {
+    categoryTotals[category] = (categoryTotals[category] || 0) + amount;
   }
 
-  // Simple sort - largest amounts first
-  topCategories.sort((a, b) => b.amount - a.amount);
+  const topCategories = Object.entries(categoryTotals).map(([categoryId, amount]) => {
+    const category = EXPENSE_CATEGORIES.find(c => c.id === categoryId);
+    return {
+      name: category?.name || 'Unknown',
+      color: category?.color || '#6b7280',
+      amount,
+      percentage: currentMonthExpenses > 0 ? (amount / currentMonthExpenses) * 100 : 0
+    };
+  });
 
-  // Keep only top 5
-  const top5Categories = topCategories.slice(0, 5);
+  const top5Categories = topCategories.sort((a, b) => b.amount - a.amount).slice(0, 5);
 
   return (
     <div className="space-y-6">
