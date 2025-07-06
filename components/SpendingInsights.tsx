@@ -46,9 +46,87 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
   const projectedMonthly = dailyAverage * 30;
   const monthlyChange = 5.2;
 
-  // Simple data for display only
-  const hasBudgets = budgets.length > 0;
-  const hasExpenses = currentMonthExpenses > 0;
+  // Simple budget calculations - no complex operations
+  const currentBudgets = [];
+  for (let i = 0; i < budgets.length; i++) {
+    const budget = budgets[i];
+    if (budget.month === currentMonth) {
+      let spent = 0;
+      for (let j = 0; j < transactions.length; j++) {
+        const transaction = transactions[j];
+        if (transaction.type === 'expense' && transaction.category === budget.categoryId) {
+          spent = spent + transaction.amount;
+        }
+      }
+
+      const percentage = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
+      const remaining = budget.amount - spent;
+
+      let categoryName = 'Unknown';
+      let categoryColor = '#6b7280';
+      for (let k = 0; k < EXPENSE_CATEGORIES.length; k++) {
+        if (EXPENSE_CATEGORIES[k].id === budget.categoryId) {
+          categoryName = EXPENSE_CATEGORIES[k].name;
+          categoryColor = EXPENSE_CATEGORIES[k].color;
+          break;
+        }
+      }
+
+      currentBudgets.push({
+        name: categoryName,
+        color: categoryColor,
+        budgeted: budget.amount,
+        spent: spent,
+        percentage: percentage,
+        remaining: remaining,
+        isOver: percentage > 100,
+        isWarning: percentage > 80 && percentage <= 100
+      });
+    }
+  }
+
+  // Simple category totals - no complex operations
+  const categoryTotals: { [key: string]: number } = {};
+  for (let i = 0; i < transactions.length; i++) {
+    const transaction = transactions[i];
+    if (transaction.type === 'expense') {
+      if (categoryTotals[transaction.category]) {
+        categoryTotals[transaction.category] = categoryTotals[transaction.category] + transaction.amount;
+      } else {
+        categoryTotals[transaction.category] = transaction.amount;
+      }
+    }
+  }
+
+  const topCategories = [];
+  for (const categoryId in categoryTotals) {
+    const amount = categoryTotals[categoryId];
+    let categoryName = 'Unknown';
+    let categoryColor = '#6b7280';
+
+    for (let i = 0; i < EXPENSE_CATEGORIES.length; i++) {
+      if (EXPENSE_CATEGORIES[i].id === categoryId) {
+        categoryName = EXPENSE_CATEGORIES[i].name;
+        categoryColor = EXPENSE_CATEGORIES[i].color;
+        break;
+      }
+    }
+
+    const percentage = currentMonthExpenses > 0 ? (amount / currentMonthExpenses) * 100 : 0;
+
+    topCategories.push({
+      name: categoryName,
+      color: categoryColor,
+      amount: amount,
+      percentage: percentage
+    });
+  }
+
+  // Simple sort - largest amounts first
+  topCategories.sort((a, b) => b.amount - a.amount);
+
+  // Keep only top 5
+  const top5Categories = topCategories.slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -118,19 +196,48 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {!hasBudgets ? (
+          {currentBudgets.length === 0 ? (
             <div className="text-center py-8 text-slate-500">
               <p>No budgets set for this month</p>
               <p className="text-sm">Set some budgets to see performance insights</p>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <p className="text-lg text-slate-700">
-                You have {budgets.length} budgets set up.
-              </p>
-              <p className="text-sm text-slate-500 mt-2">
-                Budget tracking and analysis coming soon!
-              </p>
+            <div className="space-y-4">
+              {currentBudgets.map((budget, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: budget.color }}
+                      />
+                      <span className="font-medium text-slate-900">{budget.name}</span>
+                      <Badge
+                        variant={budget.isOver ? 'destructive' : budget.isWarning ? 'secondary' : 'default'}
+                        className={budget.isWarning ? 'bg-amber-100 text-amber-800' : ''}
+                      >
+                        {budget.percentage.toFixed(1)}%
+                      </Badge>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-slate-900">
+                        ${budget.spent.toFixed(0)} / ${budget.budgeted.toFixed(0)}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        {budget.remaining > 0 ? (
+                          <span>${budget.remaining.toFixed(0)} left</span>
+                        ) : (
+                          <span>${Math.abs(budget.remaining).toFixed(0)} over</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <Progress
+                    value={Math.min(budget.percentage, 100)}
+                    className="h-2"
+                  />
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
@@ -144,18 +251,32 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {!hasExpenses ? (
+          {top5Categories.length === 0 ? (
             <div className="text-center py-8 text-slate-500">
               <p>No expenses recorded for this month</p>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <p className="text-lg text-slate-700">
-                Total expenses: ${currentMonthExpenses.toFixed(0)}
-              </p>
-              <p className="text-sm text-slate-500 mt-2">
-                Category breakdown and analysis coming soon!
-              </p>
+            <div className="space-y-3">
+              {top5Categories.map((category, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center w-8 h-8 bg-slate-200 rounded-full text-sm font-bold text-slate-600">
+                      {index + 1}
+                    </div>
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: category.color }}
+                    />
+                    <div>
+                      <p className="font-medium text-slate-900">{category.name}</p>
+                      <p className="text-sm text-slate-500">{category.percentage.toFixed(1)}% of total expenses</p>
+                    </div>
+                  </div>
+                  <span className="font-semibold text-slate-900">
+                    ${category.amount.toFixed(0)}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
