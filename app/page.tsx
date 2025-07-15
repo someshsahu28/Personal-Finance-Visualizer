@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
 import { BudgetManager } from '@/components/BudgetManager';
 import BudgetChart from '@/components/BudgetChart';
+import Header from '@/components/Header';
 
 // Dynamically import chart components to prevent SSR issues
 const MonthlyChart = dynamic(() => import('@/components/MonthlyChart').then(mod => ({ default: mod.MonthlyChart })), {
@@ -20,7 +23,7 @@ const CategoryChart = dynamic(() => import('@/components/CategoryChart').then(mo
 
 
 
-const SpendingInsights = dynamic(() => import('@/components/SpendingInsights'), {
+const SpendingInsights = dynamic(() => import('@/components/SpendingInsights').then(mod => ({ default: mod.default })), {
   ssr: false,
   loading: () => <div className="h-64 flex items-center justify-center text-slate-500">Loading insights...</div>
 });
@@ -49,6 +52,9 @@ export interface Budget {
 
 
 export default function Home() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -59,41 +65,129 @@ export default function Home() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
 
-  // Load data from localStorage on component mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedTransactions = localStorage.getItem('transactions');
-      const savedBudgets = localStorage.getItem('budgets');
+  // Load user data from API
+  const loadUserData = async () => {
+    try {
+      // Load transactions
+      const transactionsResponse = await fetch('/api/transactions', {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      if (savedTransactions) {
-        setTransactions(JSON.parse(savedTransactions));
+      if (transactionsResponse.ok) {
+        const transactionsData = await transactionsResponse.json();
+        const formattedTransactions = (transactionsData.transactions || []).map((t: any) => ({
+          ...t,
+          id: t._id,
+          date: new Date(t.date).toISOString().split('T')[0]
+        }));
+        setTransactions(formattedTransactions);
       }
-      if (savedBudgets) {
-        setBudgets(JSON.parse(savedBudgets));
+
+      // Load budgets
+      const budgetsResponse = await fetch('/api/budgets', {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (budgetsResponse.ok) {
+        const budgetsData = await budgetsResponse.json();
+        const formattedBudgets = (budgetsData.budgets || []).map((b: any) => ({
+          ...b,
+          id: b._id
+        }));
+        setBudgets(formattedBudgets);
       }
+
+      setIsLoaded(true);
+    } catch (error) {
+      console.error('Error loading user data:', error);
       setIsLoaded(true);
     }
-  }, []);
+  };
 
-  // Save data to localStorage whenever they change
+  // Check authentication with API
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('transactions', JSON.stringify(transactions));
-    }
-  }, [transactions]);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/verify', {
+          method: 'GET',
+          credentials: 'include'
+        });
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('budgets', JSON.stringify(budgets));
-    }
-  }, [budgets]);
+        if (response.ok) {
+          const data = await response.json();
+          setIsAuthenticated(true);
 
-  const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
-    const newTransaction = {
-      ...transaction,
-      id: Date.now().toString(),
+          // Load user data from API
+          await loadUserData();
+        } else {
+          // Not authenticated, redirect to signin
+          router.push('/signin');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        router.push('/signin');
+      } finally {
+        setIsLoading(false);
+      }
     };
-    setTransactions([newTransaction, ...transactions]);
+
+    checkAuth();
+  }, [router]);
+
+  // Transaction management functions
+  const addTransactionAPI = async (transaction: Omit<Transaction, 'id'>) => {
+    try {
+      const response = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...transaction,
+          date: transaction.date
+        }),
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const formattedTransaction = {
+          ...data.transaction,
+          id: data.transaction._id,
+          date: new Date(data.transaction.date).toISOString().split('T')[0]
+        };
+        setTransactions(prev => [formattedTransaction, ...prev]);
+      } else {
+        const error = await response.json();
+        console.error('Error adding transaction:', error.error);
+      }
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+    }
+  };
+
+  const deleteTransactionAPI = async (id: string) => {
+    try {
+      const response = await fetch(`/api/transactions/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        setTransactions(prev => prev.filter(t => t.id !== id));
+      } else {
+        const error = await response.json();
+        console.error('Error deleting transaction:', error.error);
+      }
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    }
+  };
+
+  const addTransaction = async (transaction: Omit<Transaction, 'id'>) => {
+    await addTransactionAPI(transaction);
     setIsFormOpen(false);
   };
 
@@ -129,16 +223,52 @@ export default function Home() {
     }
   };
 
-  const addBudget = (budget: Omit<Budget, 'id'>) => {
-    const newBudget = {
-      ...budget,
-      id: Date.now().toString(),
-    };
-    setBudgets([...budgets.filter(b => !(b.categoryId === budget.categoryId && b.month === budget.month)), newBudget]);
+  const addBudget = async (budget: Omit<Budget, 'id'>) => {
+    try {
+      const response = await fetch('/api/budgets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(budget),
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const formattedBudget = {
+          ...data.budget,
+          id: data.budget._id
+        };
+        setBudgets(prev => [
+          ...prev.filter(b => !(b.categoryId === budget.categoryId && b.month === budget.month)),
+          formattedBudget
+        ]);
+      } else {
+        const error = await response.json();
+        console.error('Error adding budget:', error.error);
+      }
+    } catch (error) {
+      console.error('Error adding budget:', error);
+    }
   };
 
-  const deleteBudget = (id: string) => {
-    setBudgets(budgets.filter(b => b.id !== id));
+  const deleteBudget = async (id: string) => {
+    try {
+      const response = await fetch(`/api/budgets/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        setBudgets(prev => prev.filter(b => b.id !== id));
+      } else {
+        const error = await response.json();
+        console.error('Error deleting budget:', error.error);
+      }
+    } catch (error) {
+      console.error('Error deleting budget:', error);
+    }
   };
 
   // Calculate totals
@@ -190,6 +320,24 @@ export default function Home() {
     return spent > budget.amount * 0.8; // Alert when 80% of budget is used
   }).length;
 
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  // Show loading screen while loading financial data
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 flex items-center justify-center">
@@ -204,11 +352,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-slate-900">Personal Finance Tracker</h1>
-          <p className="text-slate-600">Take control of your financial future with smart budgeting</p>
-        </div>
+        {/* Header with Logo */}
+        <Header />
 
         {/* Financial Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -258,55 +403,59 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className={`bg-white/80 backdrop-blur-sm hover:shadow-lg transition-shadow ${
-            budgetRemaining >= 0 ? 'border-emerald-200' : 'border-red-200'
-          }`}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className={`text-sm font-medium ${
-                budgetRemaining >= 0 ? 'text-emerald-700' : 'text-red-700'
-              }`}>
-                Budget Left
-              </CardTitle>
-              <Target className={`h-4 w-4 ${
-                budgetRemaining >= 0 ? 'text-emerald-600' : 'text-red-600'
-              }`} />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${
-                budgetRemaining >= 0 ? 'text-emerald-800' : 'text-red-800'
-              }`}>
-                ${budgetRemaining.toLocaleString()}
-              </div>
-              <div className="text-sm text-slate-600">
-                ${totalBudget.toLocaleString()} budgeted
-              </div>
-            </CardContent>
-          </Card>
+          <Link href="/budgets">
+            <Card className={`bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all cursor-pointer hover:scale-105 ${
+              budgetRemaining >= 0 ? 'border-emerald-200 hover:border-emerald-300' : 'border-red-200 hover:border-red-300'
+            }`}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className={`text-sm font-medium ${
+                  budgetRemaining >= 0 ? 'text-emerald-700' : 'text-red-700'
+                }`}>
+                  Budget Left
+                </CardTitle>
+                <Target className={`h-4 w-4 ${
+                  budgetRemaining >= 0 ? 'text-emerald-600' : 'text-red-600'
+                }`} />
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${
+                  budgetRemaining >= 0 ? 'text-emerald-800' : 'text-red-800'
+                }`}>
+                  ${budgetRemaining.toLocaleString()}
+                </div>
+                <div className="text-sm text-slate-600">
+                  ${totalBudget.toLocaleString()} budgeted
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card className={`bg-white/80 backdrop-blur-sm hover:shadow-lg transition-shadow ${
-            budgetAlerts > 0 ? 'border-amber-200' : 'border-purple-200'
-          }`}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className={`text-sm font-medium ${
-                budgetAlerts > 0 ? 'text-amber-700' : 'text-purple-700'
-              }`}>
-                Budget Alerts
-              </CardTitle>
-              <AlertTriangle className={`h-4 w-4 ${
-                budgetAlerts > 0 ? 'text-amber-600' : 'text-purple-600'
-              }`} />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${
-                budgetAlerts > 0 ? 'text-amber-800' : 'text-purple-800'
-              }`}>
-                {budgetAlerts}
-              </div>
-              <div className="text-sm text-slate-600">
-                {budgetAlerts > 0 ? 'Categories over 80%' : 'All on track'}
-              </div>
-            </CardContent>
-          </Card>
+          <Link href="/insights">
+            <Card className={`bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all cursor-pointer hover:scale-105 ${
+              budgetAlerts > 0 ? 'border-amber-200 hover:border-amber-300' : 'border-purple-200 hover:border-purple-300'
+            }`}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className={`text-sm font-medium ${
+                  budgetAlerts > 0 ? 'text-amber-700' : 'text-purple-700'
+                }`}>
+                  Budget Alerts
+                </CardTitle>
+                <AlertTriangle className={`h-4 w-4 ${
+                  budgetAlerts > 0 ? 'text-amber-600' : 'text-purple-600'
+                }`} />
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${
+                  budgetAlerts > 0 ? 'text-amber-800' : 'text-purple-800'
+                }`}>
+                  {budgetAlerts}
+                </div>
+                <div className="text-sm text-slate-600">
+                  {budgetAlerts > 0 ? 'Categories over 80%' : 'All on track'}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Add Transaction Button */}
