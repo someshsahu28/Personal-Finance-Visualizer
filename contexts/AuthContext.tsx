@@ -22,7 +22,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is authenticated on app load
     const checkAuth = () => {
       const authStatus = localStorage.getItem('isAuthenticated');
       const email = localStorage.getItem('userEmail');

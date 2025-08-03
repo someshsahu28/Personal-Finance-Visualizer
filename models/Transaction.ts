@@ -48,7 +48,6 @@ const TransactionSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Create compound indexes for better query performance
 TransactionSchema.index({ userId: 1, date: -1 });
 TransactionSchema.index({ userId: 1, type: 1 });
 TransactionSchema.index({ userId: 1, category: 1 });

@@ -10,7 +10,6 @@ import { BudgetManager } from '@/components/BudgetManager';
 import BudgetChart from '@/components/BudgetChart';
 import Header from '@/components/Header';
 
-// Dynamically import chart components to prevent SSR issues
 const MonthlyChart = dynamic(() => import('@/components/MonthlyChart').then(mod => ({ default: mod.MonthlyChart })), {
   ssr: false,
   loading: () => <div className="h-64 flex items-center justify-center text-slate-500">Loading chart...</div>

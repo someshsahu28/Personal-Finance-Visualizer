@@ -11,7 +11,6 @@ export default function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Check for user authentication on component mount
   useEffect(() => {
     const checkAuth = async () => {
       try {

@@ -4,7 +4,7 @@ export interface IBudget extends Document {
   userId: mongoose.Types.ObjectId;
   categoryId: string;
   amount: number;
-  month: string; // Format: YYYY-MM
+  month: string; 
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,7 +36,6 @@ const BudgetSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Create compound indexes for better query performance
 BudgetSchema.index({ userId: 1, month: 1 });
 BudgetSchema.index({ userId: 1, categoryId: 1, month: 1 }, { unique: true });
 

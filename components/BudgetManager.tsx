@@ -43,7 +43,6 @@ export function BudgetManager({
       newErrors.amount = 'Budget amount must be greater than 0';
     }
 
-    // Check if budget already exists for this category and month
     const existingBudget = currentMonthBudgets.find(b => b.categoryId === selectedCategory);
     if (existingBudget) {
       newErrors.category = 'Budget already exists for this category';
@@ -80,8 +79,7 @@ export function BudgetManager({
   const generateMonthOptions = () => {
     const options = [];
     const currentDate = new Date();
-    
-    // Generate 12 months: 6 past, current, 5 future
+  
     for (let i = -6; i <= 5; i++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
