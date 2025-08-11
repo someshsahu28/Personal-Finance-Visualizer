@@ -30,8 +30,29 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
   const expenses = transactions.filter(t => t.type === 'expense');
   const income = transactions.filter(t => t.type === 'income');
 
-  const currentMonthExpenses = expenses.reduce((acc, t) => acc + t.amount, 0);
-  const currentMonthIncome = income.reduce((acc, t) => acc + t.amount, 0);
+  // Filter transactions by current month
+  const currentMonthExpenses = expenses
+    .filter(t => t.date.startsWith(currentMonth))
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const currentMonthIncome = income
+    .filter(t => t.date.startsWith(currentMonth))
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  // Calculate previous month for comparison
+  const currentDate = new Date(currentMonth + '-01');
+  const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+  const previousMonthString = `${previousMonth.getFullYear()}-${String(previousMonth.getMonth() + 1).padStart(2, '0')}`;
+
+  // Calculate previous month expenses
+  const previousMonthExpenses = expenses
+    .filter(t => t.date.startsWith(previousMonthString))
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  // Calculate actual monthly change percentage
+  const monthlyChange = previousMonthExpenses > 0
+    ? ((currentMonthExpenses - previousMonthExpenses) / previousMonthExpenses) * 100
+    : 0;
 
   const savingsRate =
     currentMonthIncome > 0
@@ -40,7 +61,6 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
 
   const dailyAverage = currentMonthExpenses / 30;
   const projectedMonthly = dailyAverage * 30;
-  const monthlyChange = 5.2;
 
   const currentBudgets = budgets
     .filter(b => b.month === currentMonth)
@@ -89,13 +109,15 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
         <Card className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-700">Monthly Change</CardTitle>
-            <TrendingUp className="h-4 w-4 text-red-600" />
+            <TrendingUp className={`h-4 w-4 ${monthlyChange >= 0 ? 'text-red-600' : 'text-green-600'}`} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-800">
-              +{monthlyChange.toFixed(1)}%
+            <div className={`text-2xl font-bold ${monthlyChange >= 0 ? 'text-red-800' : 'text-green-800'}`}>
+              {monthlyChange >= 0 ? '+' : ''}{monthlyChange.toFixed(1)}%
             </div>
-            <p className="text-xs text-slate-600">vs last month</p>
+            <p className="text-xs text-slate-600">
+              {previousMonthExpenses > 0 ? 'vs last month' : 'no previous data'}
+            </p>
           </CardContent>
         </Card>
 
@@ -251,18 +273,22 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
             </div>
 
             {/* Monthly Spending Trend */}
-            <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
-              <div className="flex items-start space-x-3">
-                <TrendingUp className="h-5 w-5 text-yellow-600 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-yellow-900">Monthly Spending Trend</h4>
-                  <p className="text-sm text-yellow-700 mt-1">
-                    Your spending increased by {monthlyChange.toFixed(1)}% this month compared to last month.
-                    Monitor this trend to avoid budget overruns and consider reviewing your spending categories.
-                  </p>
+            {previousMonthExpenses > 0 && (
+              <div className={`p-4 bg-gradient-to-r ${monthlyChange >= 0 ? 'from-yellow-50 to-orange-50 border-yellow-200' : 'from-green-50 to-emerald-50 border-green-200'} rounded-lg border`}>
+                <div className="flex items-start space-x-3">
+                  <TrendingUp className={`h-5 w-5 ${monthlyChange >= 0 ? 'text-yellow-600' : 'text-green-600'} mt-0.5`} />
+                  <div>
+                    <h4 className={`font-medium ${monthlyChange >= 0 ? 'text-yellow-900' : 'text-green-900'}`}>Monthly Spending Trend</h4>
+                    <p className={`text-sm ${monthlyChange >= 0 ? 'text-yellow-700' : 'text-green-700'} mt-1`}>
+                      {monthlyChange >= 0
+                        ? `Your spending increased by ${monthlyChange.toFixed(1)}% this month compared to last month. Monitor this trend to avoid budget overruns and consider reviewing your spending categories.`
+                        : `Great news! Your spending decreased by ${Math.abs(monthlyChange).toFixed(1)}% this month compared to last month. Keep up the good work with your budget management.`
+                      }
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Daily Spending Pattern */}
             <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
