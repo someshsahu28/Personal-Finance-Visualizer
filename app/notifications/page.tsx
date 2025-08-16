@@ -21,7 +21,7 @@ export default function NotificationsPage() {
   }, []);
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
         <Link href="/" className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Dashboard

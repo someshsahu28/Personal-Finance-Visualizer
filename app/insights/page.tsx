@@ -171,7 +171,7 @@ export default function InsightsPage() {
               <TrendingUp className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-800">${currentMonthExpenses.toFixed(0)}</div>
+                             <div className="text-2xl font-bold text-blue-800">₹{currentMonthExpenses.toFixed(0)}</div>
               <p className="text-xs text-slate-600">This month</p>
             </CardContent>
           </Card>
@@ -182,7 +182,7 @@ export default function InsightsPage() {
               <Target className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-800">${totalBudgeted.toFixed(0)}</div>
+                             <div className="text-2xl font-bold text-green-800">₹{totalBudgeted.toFixed(0)}</div>
               <p className="text-xs text-slate-600">For {currentMonth}</p>
             </CardContent>
           </Card>

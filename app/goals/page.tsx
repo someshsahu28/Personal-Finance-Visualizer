@@ -67,7 +67,7 @@ export default function GoalsPage() {
   const daysLeft = (g: Goal) => g.targetDate ? Math.ceil((new Date(g.targetDate).getTime() - Date.now()) / (1000*60*60*24)) : undefined;
 
   return (
-    <div className="p-2 sm:p-4 space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
         <Link href="/" className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Dashboard
