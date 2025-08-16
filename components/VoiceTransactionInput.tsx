@@ -305,18 +305,7 @@ export default function VoiceTransactionInput({ onTransactionParsed, onTransacti
         </div>
 
         <div className="flex space-x-2">
-          <Button
-            onClick={() => {
-              const testText = "spent 50 rupees on lunch";
-              setTranscript(testText);
-              parseVoiceInput(testText);
-            }}
-            variant="secondary"
-            className="flex-1"
-          >
-            Test
-          </Button>
-          <Button onClick={onClose} variant="outline" className="flex-1">
+        <Button onClick={onClose} variant="outline" className="w-full">
             Cancel
           </Button>
         </div>
