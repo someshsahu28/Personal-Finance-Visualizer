@@ -73,7 +73,7 @@ export function MonthlyChart({ transactions }: MonthlyChartProps) {
           <YAxis
             tick={{ fill: '#64748b', fontSize: 12 }}
             axisLine={{ stroke: '#cbd5e1' }}
-            tickFormatter={(value) => `$${value.toLocaleString()}`}
+            tickFormatter={(value) => `₹${value.toLocaleString()}`}
           />
           {/* @ts-ignore */}
           <Tooltip
@@ -84,7 +84,7 @@ export function MonthlyChart({ transactions }: MonthlyChartProps) {
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
             formatter={(value: number, name: string) => [
-              `$${value.toLocaleString()}`,
+              `₹${value.toLocaleString()}`,
               name.charAt(0).toUpperCase() + name.slice(1)
             ]}
           />

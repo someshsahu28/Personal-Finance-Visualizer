@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, Save, AlertCircle } from 'lucide-react';
+import { X, Save, AlertCircle, Mic } from 'lucide-react';
 import { Transaction } from '@/app/page';
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/lib/constants';
+import VoiceTransactionInput from './VoiceTransactionInput';
 
 interface TransactionFormProps {
   onSubmit: (transaction: Omit<Transaction, 'id'> | Transaction) => void;
@@ -23,6 +24,7 @@ export function TransactionForm({ onSubmit, onCancel, initialData }: Transaction
   const [type, setType] = useState<'income' | 'expense'>(initialData?.type || 'expense');
   const [category, setCategory] = useState(initialData?.category || '');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showVoiceInput, setShowVoiceInput] = useState(false);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -51,9 +53,25 @@ export function TransactionForm({ onSubmit, onCancel, initialData }: Transaction
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleVoiceInput = (voiceTransaction: {
+    amount: number;
+    description: string;
+    type: 'income' | 'expense';
+    category: string;
+  }) => {
+    console.log('TransactionForm received voice input:', voiceTransaction);
+    setAmount(voiceTransaction.amount.toString());
+    setDescription(voiceTransaction.description);
+    setType(voiceTransaction.type);
+    setCategory(voiceTransaction.category);
+    setShowVoiceInput(false);
+    setErrors({});
+    console.log('Form fields updated with voice input');
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -80,26 +98,37 @@ export function TransactionForm({ onSubmit, onCancel, initialData }: Transaction
 
   const categories = type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 
+  if (showVoiceInput) {
+    return (
+      <VoiceTransactionInput
+        onTransactionParsed={handleVoiceInput}
+        onClose={() => setShowVoiceInput(false)}
+      />
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="text-xl font-semibold">
           {initialData ? 'Edit Transaction' : 'Add New Transaction'}
         </CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onCancel}
-          className="h-8 w-8 p-0 hover:bg-slate-100"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onCancel}
+            className="h-8 w-8 p-0 hover:bg-slate-100"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount ($)</Label>
+              <Label htmlFor="amount">Amount (₹)</Label>
               <Input
                 id="amount"
                 type="number"

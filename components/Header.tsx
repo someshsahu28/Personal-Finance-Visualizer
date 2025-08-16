@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { User, LogOut } from 'lucide-react';
 
@@ -90,6 +91,14 @@ export default function Header() {
               <div className="px-4 py-3 border-b border-gray-100">
                 <p className="text-sm font-medium text-gray-900">Welcome back,</p>
                 <p className="text-sm text-blue-600 font-semibold truncate">{userEmail}</p>
+              </div>
+
+              {/* Quick Links */}
+              <div className="py-2 border-b border-gray-100">
+                <Link href="/goals" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Goals</Link>
+                <Link href="/accounts" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Accounts</Link>
+                <Link href="/analytics" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Analytics</Link>
+                <Link href="/notifications" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Notifications</Link>
               </div>
 
               {/* Logout Button */}

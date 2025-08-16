@@ -128,7 +128,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-800">
-              ${dailyAverage.toFixed(0)}
+              ₹{dailyAverage.toFixed(0)}
             </div>
             <p className="text-xs text-slate-600">per day this month</p>
           </CardContent>
@@ -141,7 +141,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-800">
-              ${projectedMonthly.toFixed(0)}
+              ₹{projectedMonthly.toFixed(0)}
             </div>
             <p className="text-xs text-slate-600">at current rate</p>
           </CardContent>
@@ -192,10 +192,10 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-slate-900">
-                        ${budget.spent.toFixed(0)} / ${budget.budgeted.toFixed(0)}
+                        ₹{budget.spent.toFixed(0)} / ₹{budget.budgeted.toFixed(0)}
                       </p>
                       <p className={`text-sm ${budget.isOver ? 'text-red-600 font-medium' : budget.isWarning ? 'text-yellow-600' : 'text-green-600'}`}>
-                        {budget.isOver ? `Over Budget by $${Math.abs(budget.remaining).toFixed(0)}` : budget.isWarning ? 'Near Limit' : 'On Track'}
+                        {budget.isOver ? `Over Budget by ₹${Math.abs(budget.remaining).toFixed(0)}` : budget.isWarning ? 'Near Limit' : 'On Track'}
                       </p>
                       <p className="text-xs text-slate-500">
                         {budget.percentage.toFixed(1)}% used
@@ -236,7 +236,7 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
                       </div>
                     </div>
                     <span className="font-semibold text-slate-900">
-                      ${category.amount.toFixed(0)}
+                      ₹{category.amount.toFixed(0)}
                     </span>
                   </div>
                 </div>
@@ -297,8 +297,8 @@ function SpendingInsights({ transactions, budgets, currentMonth }: SpendingInsig
                 <div>
                   <h4 className="font-medium text-purple-900">Daily Spending Pattern</h4>
                   <p className="text-sm text-purple-700 mt-1">
-                    You're spending an average of ${dailyAverage.toFixed(0)} per day this month.
-                    At this rate, your monthly expenses will be ${projectedMonthly.toFixed(0)}.
+                    You're spending an average of ₹{dailyAverage.toFixed(0)} per day this month.
+                    At this rate, your monthly expenses will be ₹{projectedMonthly.toFixed(0)}.
                     Consider setting daily spending limits to stay on track with your budget.
                   </p>
                 </div>

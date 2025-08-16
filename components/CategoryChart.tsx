@@ -57,7 +57,7 @@ export function CategoryChart({ transactions }: CategoryChartProps) {
         <div className="bg-white p-3 border border-slate-200 rounded-lg shadow-lg">
           <p className="font-medium text-slate-900">{data.name}</p>
           <p className="text-sm text-slate-600">
-            ${data.value.toLocaleString()} ({percentage}%)
+            ₹{data.value.toLocaleString()} ({percentage}%)
           </p>
         </div>
       );

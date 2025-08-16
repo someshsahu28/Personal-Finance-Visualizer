@@ -7,6 +7,7 @@ export interface ITransaction extends Document {
   description: string;
   type: 'income' | 'expense';
   category: string;
+  accountId?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +44,12 @@ const TransactionSchema: Schema = new Schema({
     type: String,
     required: [true, 'Category is required'],
     trim: true
+  },
+  accountId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: false,
+    index: true
   }
 }, {
   timestamps: true

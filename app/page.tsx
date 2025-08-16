@@ -29,7 +29,8 @@ const SpendingInsights = dynamic(() => import('@/components/SpendingInsights').t
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, TrendingUp, TrendingDown, DollarSign, PieChart, Target, AlertTriangle } from 'lucide-react';
+import { PlusCircle, TrendingUp, TrendingDown, DollarSign, PieChart, Target, AlertTriangle, Mic } from 'lucide-react';
+import VoiceTransactionInput from '@/components/VoiceTransactionInput';
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/lib/constants';
 
 export interface Transaction {
@@ -57,6 +58,7 @@ export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isVoiceInputOpen, setIsVoiceInputOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -188,6 +190,12 @@ export default function Home() {
   const addTransaction = async (transaction: Omit<Transaction, 'id'>) => {
     await addTransactionAPI(transaction);
     setIsFormOpen(false);
+  };
+
+  const handleVoiceTransaction = async (transaction: Omit<Transaction, 'id'>) => {
+    console.log('Voice transaction received:', transaction);
+    await addTransactionAPI(transaction);
+    setIsVoiceInputOpen(false);
   };
 
   const editTransaction = (updatedTransaction: Transaction) => {
@@ -363,7 +371,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-800">
-                ${totalIncome.toLocaleString()}
+                ₹{totalIncome.toLocaleString()}
               </div>
             </CardContent>
           </Card>
@@ -375,7 +383,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-800">
-                ${totalExpenses.toLocaleString()}
+                ₹{totalExpenses.toLocaleString()}
               </div>
             </CardContent>
           </Card>
@@ -397,7 +405,7 @@ export default function Home() {
               <div className={`text-2xl font-bold ${
                 balance >= 0 ? 'text-blue-800' : 'text-orange-800'
               }`}>
-                ${balance.toLocaleString()}
+                ₹{balance.toLocaleString()}
               </div>
             </CardContent>
           </Card>
@@ -420,10 +428,10 @@ export default function Home() {
                 <div className={`text-2xl font-bold ${
                   budgetRemaining >= 0 ? 'text-emerald-800' : 'text-red-800'
                 }`}>
-                  ${budgetRemaining.toLocaleString()}
+                  ₹{budgetRemaining.toLocaleString()}
                 </div>
                 <div className="text-sm text-slate-600">
-                  ${totalBudget.toLocaleString()} budgeted
+                  ₹{totalBudget.toLocaleString()} budgeted
                 </div>
               </CardContent>
             </Card>
@@ -457,14 +465,21 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Add Transaction Button */}
-        <div className="flex justify-center">
+        {/* Add Transaction Buttons */}
+        <div className="flex justify-center space-x-4">
           <Button
             onClick={() => setIsFormOpen(true)}
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <PlusCircle className="mr-2 h-5 w-5" />
             Add Transaction
+          </Button>
+          <Button
+            onClick={() => setIsVoiceInputOpen(true)}
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            <Mic className="mr-2 h-5 w-5" />
+            Voice Add
           </Button>
         </div>
 
@@ -476,6 +491,18 @@ export default function Home() {
                 onSubmit={handleTransactionSubmit}
                 onCancel={handleCloseForm}
                 initialData={editingTransaction}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Voice Input Modal */}
+        {isVoiceInputOpen && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
+              <VoiceTransactionInput
+                onTransactionSubmit={handleVoiceTransaction}
+                onClose={() => setIsVoiceInputOpen(false)}
               />
             </div>
           </div>
@@ -543,7 +570,7 @@ export default function Home() {
                               </div>
                             </div>
                             <span className="font-semibold text-slate-900">
-                              ${amount.toLocaleString()}
+                              ₹{amount.toLocaleString()}
                             </span>
                           </div>
                         );
@@ -590,7 +617,7 @@ export default function Home() {
                           <span className={`font-semibold ${
                             transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                           }`}>
-                            {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString()}
+                            {transaction.type === 'income' ? '+' : '-'}₹{transaction.amount.toLocaleString()}
                           </span>
                         </div>
                       );

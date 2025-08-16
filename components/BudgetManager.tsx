@@ -151,7 +151,7 @@ export function BudgetManager({
             </div>
 
             <div className="space-y-2">
-              <Label>Budget Amount ($)</Label>
+              <Label>Budget Amount (₹)</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -221,7 +221,7 @@ export function BudgetManager({
                     
                     <div className="flex items-center space-x-3">
                       <Badge variant="outline" className="font-semibold">
-                        ${budget.amount.toLocaleString()}
+                        ₹{budget.amount.toLocaleString()}
                       </Badge>
                       <Button
                         variant="ghost"
