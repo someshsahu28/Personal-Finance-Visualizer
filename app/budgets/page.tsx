@@ -204,8 +204,8 @@ export default function BudgetsPage() {
     }, {} as Record<string, number>);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="space-y-4 sm:space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-2 sm:p-4">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
         <Header />
 
@@ -231,7 +231,7 @@ export default function BudgetsPage() {
               <Target className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-800">${totalBudgeted.toFixed(0)}</div>
+              <div className="text-2xl font-bold text-blue-800">₹{totalBudgeted.toFixed(0)}</div>
               <p className="text-xs text-slate-600">For {currentMonth}</p>
             </CardContent>
           </Card>
@@ -244,9 +244,9 @@ export default function BudgetsPage() {
               <TrendingUp className={`h-4 w-4 ${budgetRemaining >= 0 ? 'text-green-600' : 'text-red-600'}`} />
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${budgetRemaining >= 0 ? 'text-green-800' : 'text-red-800'}`}>
-                ${Math.abs(budgetRemaining).toFixed(0)}
-              </div>
+                              <div className={`text-2xl font-bold ${budgetRemaining >= 0 ? 'text-green-800' : 'text-red-800'}`}>
+                 ₹{Math.abs(budgetRemaining).toFixed(0)}
+                </div>
               <p className="text-xs text-slate-600">
                 {budgetRemaining >= 0 ? 'Under budget' : 'Over budget'}
               </p>
