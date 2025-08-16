@@ -126,7 +126,7 @@ export function TransactionForm({ onSubmit, onCancel, initialData }: Transaction
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="amount">Amount (₹)</Label>
               <Input
@@ -181,7 +181,7 @@ export function TransactionForm({ onSubmit, onCancel, initialData }: Transaction
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Type</Label>
               <Select value={type} onValueChange={handleTypeChange}>
@@ -221,7 +221,7 @@ export function TransactionForm({ onSubmit, onCancel, initialData }: Transaction
             </div>
           </div>
 
-          <div className="flex space-x-2 pt-4">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
             <Button
               type="submit"
               className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"

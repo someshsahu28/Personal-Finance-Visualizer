@@ -50,7 +50,7 @@ export function CategoryComparisonChart({ transactions }: Props) {
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 20, right: 20, left: 10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="category" tick={{ fill: '#64748b', fontSize: 12 }} interval={0} angle={-20} textAnchor="end" height={60} />
+          <XAxis dataKey="category" tick={{ fill: '#64748b', fontSize: 12 }} angle={-20} textAnchor="end" height={60} />
           <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(v)=>`₹${v.toLocaleString()}`} />
           <Tooltip formatter={(v:number, n:string)=>[`₹${v.toLocaleString()}`, n]} />
           <Legend />

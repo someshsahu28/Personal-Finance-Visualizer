@@ -124,7 +124,7 @@ export function BudgetManager({
         <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-slate-50 rounded-lg">
           <h3 className="font-medium text-slate-900">Add New Budget</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Category</Label>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>

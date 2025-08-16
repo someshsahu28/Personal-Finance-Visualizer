@@ -67,7 +67,7 @@ export default function GoalsPage() {
   const daysLeft = (g: Goal) => g.targetDate ? Math.ceil((new Date(g.targetDate).getTime() - Date.now()) / (1000*60*60*24)) : undefined;
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-2 sm:p-4 space-y-4 sm:space-y-6">
       <div>
         <Link href="/" className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Dashboard
@@ -79,7 +79,7 @@ export default function GoalsPage() {
           <CardTitle>New Goal</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={addGoal} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <form onSubmit={addGoal} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div>
               <Label>Name</Label>
               <Input value={name} onChange={e=>setName(e.target.value)} placeholder="Emergency fund" />
@@ -96,7 +96,7 @@ export default function GoalsPage() {
               <Label>Priority (1-5)</Label>
               <Input type="number" min={1} max={5} value={priority} onChange={e=>setPriority(e.target.value)} />
             </div>
-            <Button type="submit" className="md:col-span-4">Add Goal</Button>
+            <Button type="submit" className="sm:col-span-2 lg:col-span-4">Add Goal</Button>
           </form>
         </CardContent>
       </Card>
@@ -162,7 +162,7 @@ export default function GoalsPage() {
 
                   <div className="mt-2">
                     {editingId === g._id && (
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 mb-2">
                         <Input value={editForm.name} onChange={e=>setEditForm({...editForm, name: e.target.value})} placeholder="Name" />
                         <Input type="number" value={editForm.targetAmount} onChange={e=>setEditForm({...editForm, targetAmount: e.target.value})} placeholder="Target Amount" />
                         <Input type="date" value={editForm.targetDate} onChange={e=>setEditForm({...editForm, targetDate: e.target.value})} />
